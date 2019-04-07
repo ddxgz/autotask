@@ -12,7 +12,7 @@ type AutoTask func() error
 type AutoUpdater struct {
 	interval    int
 	intervalMin int
-	timeUnit    int64
+	timeUnit time.Duration
 	started     bool
 	done        chan bool
 	task        AutoTask
@@ -21,7 +21,7 @@ type AutoUpdater struct {
 type autoUpdaterStatus struct {
 	Interval    int `json:"interval"`
 	IntervalMin int `json:"interval_min"`
-	TimeUnit    int64 `json:"time_unit"`
+	TimeUnit    time.Duration `json:"time_unit"`
 	Started     bool `json:"started"`
 }
 
@@ -53,7 +53,7 @@ func (u *AutoUpdater) SetInterval(interval int) error {
 func (u *AutoUpdater) Start() {
 	// u := FeedUpdater
 	// ticker := time.NewTicker(time.Duration(u.interval) * time.Hour)
-	ticker := time.NewTicker(time.Duration(u.interval) * u.TimeUnit)
+	ticker := time.NewTicker(time.Duration(u.interval) * u.timeUnit)
 	// ticker := time.NewTicker(2 * time.Second)
 	defer ticker.Stop()
 	// done := make(chan bool)

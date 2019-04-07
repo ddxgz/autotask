@@ -1,4 +1,4 @@
-package infocrawler
+package autotask
 
 import (
 	"fmt"

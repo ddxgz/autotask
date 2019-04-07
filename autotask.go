@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-
 type AutoTask func() error
 
 type AutoUpdater struct {
@@ -22,6 +21,22 @@ type autoUpdaterStatus struct {
 	Interval    int  `json:"interval"`
 	IntervalMin int  `json:"interval_min"`
 	Started     bool `json:"started"`
+}
+
+type Options struct {
+	Interval    int
+	IntervalMin int
+	Task        AutoTask
+}
+
+func New(o Options) *AutoUpdater {
+	return &AutoUpdater{
+		interval:    o.Interval,
+		intervalMin: o.IntervalMin,
+		started:     false,
+		done:        make(chan bool),
+		task:        o.Task,
+	}
 }
 
 func (u *AutoUpdater) SetInterval(interval int) error {

@@ -12,17 +12,17 @@ type AutoTask func() error
 type AutoUpdater struct {
 	interval    int
 	intervalMin int
-	timeUnit time.Duration
+	timeUnit    time.Duration
 	started     bool
 	done        chan bool
 	task        AutoTask
 }
 
 type autoUpdaterStatus struct {
-	Interval    int `json:"interval"`
-	IntervalMin int `json:"interval_min"`
+	Interval    int           `json:"interval"`
+	IntervalMin int           `json:"interval_min"`
 	TimeUnit    time.Duration `json:"time_unit"`
-	Started     bool `json:"started"`
+	Started     bool          `json:"started"`
 }
 
 type Options struct {
@@ -35,7 +35,7 @@ func New(o Options) *AutoUpdater {
 	return &AutoUpdater{
 		interval:    o.Interval,
 		intervalMin: o.IntervalMin,
-		timeUnit: time.Hour,
+		timeUnit:    time.Hour,
 		started:     false,
 		done:        make(chan bool),
 		task:        o.Task,
@@ -47,6 +47,11 @@ func (u *AutoUpdater) SetInterval(interval int) error {
 		return errors.New("Cannot set interval smaller than IntervalMin()")
 	}
 	u.interval = interval
+	return nil
+}
+
+func (u *AutoUpdater) SetTimeUnit(unit time.Duration) error {
+	u.timeUnit = unit
 	return nil
 }
 
@@ -95,7 +100,7 @@ func (u *AutoUpdater) Status() autoUpdaterStatus {
 	return autoUpdaterStatus{
 		Interval:    u.interval,
 		IntervalMin: u.intervalMin,
-		TimeUnit: u.timeUnit,
+		TimeUnit:    u.timeUnit,
 		Started:     u.started,
 	}
 }

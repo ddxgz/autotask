@@ -11,7 +11,7 @@ import (
 )
 
 func autoTaskFunc() error {
-	for i := 1; i <= 3; i++ {
+	for i := 1; i <= 5; i++ {
 		fmt.Printf("auto task running %v step at: %v\n", i, time.Now())
 		time.Sleep(1 * time.Second)
 	}
@@ -19,9 +19,9 @@ func autoTaskFunc() error {
 }
 
 func autoTaskErrFunc() error {
-	for i := 1; i <= 5; i++ {
+	for i := 1; i <= 2; i++ {
 		fmt.Printf("auto task running %v step at: %v\n", i, time.Now())
-		time.Sleep(1 * time.Second)
+		time.Sleep(1 * time.Millisecond)
 	}
 	return errors.New("auto task err func error")
 }
@@ -55,6 +55,29 @@ func TestStartStop(t *testing.T) {
 	time.Sleep(1 * time.Millisecond)
 	if tasker.Started() == true {
 		t.Errorf("task not stopped after call Stop!")
+	}
+
+}
+
+func TestErrInTask(t *testing.T) {
+
+	var tasker = autotask.New(autotask.Options{
+		Interval:    3,
+		IntervalMin: 3,
+		Task:        autoTaskErrFunc,
+	})
+	tasker.SetTimeUnit(time.Millisecond)
+
+	go tasker.Start()
+
+	time.Sleep(1 * time.Millisecond)
+	if tasker.Started() != true {
+		t.Errorf("task not started after start!")
+	}
+
+	time.Sleep(9 * time.Millisecond)
+	if tasker.Started() == true {
+		t.Errorf("task not stopped after error occurred!")
 	}
 
 }

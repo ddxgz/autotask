@@ -105,3 +105,44 @@ func TestStatus(t *testing.T) {
 	}
 
 }
+
+func TestStartRunImmediate(t *testing.T) {
+	running := make(chan bool)
+	var tasker = autotask.New(autotask.Options{
+		Interval:    50,
+		IntervalMin: 5,
+		Task: func() error {
+			running <- true
+			for i := 1; i <= 3; i++ {
+				fmt.Printf("immediate task running %v step at: %v\n", i, time.Now())
+				time.Sleep(10 * time.Millisecond)
+			}
+			return nil
+		},
+	})
+
+	tasker.SetTimeUnit(time.Millisecond)
+	tasker.SetRunImmediate(true)
+
+	if tasker.Started() == true {
+		t.Errorf("task started before really start!")
+	}
+
+	go tasker.Start()
+
+	time.Sleep(2 * time.Millisecond)
+	if tasker.Started() != true {
+		t.Errorf("task not started after start!")
+	}
+
+	isRunning := <-running
+	if isRunning != true {
+		t.Errorf("task not running immediately!")
+	}
+
+	tasker.Stop()
+	time.Sleep(1 * time.Millisecond)
+	if tasker.Started() == true {
+		t.Errorf("task not stopped after call Stop!")
+	}
+}

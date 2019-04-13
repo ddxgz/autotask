@@ -10,12 +10,13 @@ import (
 type AutoTask func() error
 
 type AutoUpdater struct {
-	interval    int
-	intervalMin int
-	timeUnit    time.Duration
-	started     bool
-	done        chan bool
-	task        AutoTask
+	interval       int
+	intervalMin    int
+	timeUnit       time.Duration
+	started        bool
+	done           chan bool
+	task           AutoTask
+	runImmediate bool
 }
 
 type autoUpdaterStatus struct {
@@ -33,12 +34,13 @@ type Options struct {
 
 func New(o Options) *AutoUpdater {
 	return &AutoUpdater{
-		interval:    o.Interval,
-		intervalMin: o.IntervalMin,
-		timeUnit:    time.Hour,
-		started:     false,
-		done:        make(chan bool),
-		task:        o.Task,
+		interval:       o.Interval,
+		intervalMin:    o.IntervalMin,
+		timeUnit:       time.Hour,
+		started:        false,
+		done:           make(chan bool),
+		task:           o.Task,
+		runImmediate: false,
 	}
 }
 
@@ -52,6 +54,11 @@ func (u *AutoUpdater) SetInterval(interval int) error {
 
 func (u *AutoUpdater) SetTimeUnit(unit time.Duration) error {
 	u.timeUnit = unit
+	return nil
+}
+
+func (u *AutoUpdater) SetRunImmediate(t bool) error {
+	u.runImmediate = t
 	return nil
 }
 
@@ -70,6 +77,14 @@ func (u *AutoUpdater) Start() {
 		return
 	}
 	u.started = true
+
+	if u.runImmediate {
+		if err := u.task(); err != nil {
+			fmt.Println("task stopped due to err, ", err)
+			u.Stop()
+			return
+		}
+	}
 
 	for {
 		select {

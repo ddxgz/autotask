@@ -55,6 +55,9 @@ func (u *AutoUpdater) SetTimeUnit(unit time.Duration) error {
 	return nil
 }
 
+// AutoUpdater.Start() starts the process of running a task. It firstly waits
+// for an interval and then starts the task, and then waits for an interval
+// again. It will stop if an error returned from the task.
 func (u *AutoUpdater) Start() {
 	// u := FeedUpdater
 	// ticker := time.NewTicker(time.Duration(u.interval) * time.Hour)

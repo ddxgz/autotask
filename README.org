@@ -1,1 +1,3 @@
 autotask provides function for periodly running a task by a interval
+* TODOs
+- [ ] able to batch import tasks with individual configuration
